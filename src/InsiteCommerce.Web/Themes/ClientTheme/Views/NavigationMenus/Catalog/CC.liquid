@@ -1,0 +1,16 @@
+﻿[% comment %]
+This uses NavigationMenuItemDrop as the model
+[% endcomment %]
+<li class="top-level-category top-level-item">
+    <a href="[% rootCategoryUrl %]" ng-click="vm.hideB2CNav($event)">
+        <span class="nav-options">[% translate 'Shop Products' %]</span>
+        <label class="toggle-sub"></label>
+    </a>
+    <ul class="second-level-subnav">
+        [% for topLevelItem in Model.Children %]
+       <li class="second-level-category">
+            <a href="[[topLevelItem.Url]]" ng-click="vm.hideB2CNav($event)">[[topLevelItem.Title]]</a>
+       </li>
+        [% endfor %]
+    </ul>
+</li>

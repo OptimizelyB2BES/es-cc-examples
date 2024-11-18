@@ -1,0 +1,8 @@
+{
+  "IsAuthorized": {
+    "DisplayLinkForRememberedUser": true,
+    "IsAllowedForRememberedUser": true,
+    "DisallowedRoles": [ "Accounting" ]
+  },
+  "DisallowForPunchOut": {}
+}

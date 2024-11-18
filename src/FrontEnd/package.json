@@ -1,0 +1,41 @@
+{
+    "name": "root",
+    "private": true,
+    "engines": {
+        "npm": "~8.19.1"
+    },
+    "config": {
+        "blueprint": "[blueprint-name]",
+        "clientName": "[client-name]",
+        "siteShortName": "[tla]",
+        "envName": "[local/sbx/prd]",
+        "ps": "cd ..\\..\\ & @powershell -NoProfile -ExecutionPolicy Unrestricted -Command",
+        "sqlServerInstance": "[sql-server-instance]"
+    },
+    "scripts": {
+        "postinstall": "node validateLockFile.js",
+        "@comment ES Scripts": "Following scripts authored and used by ES team",
+        "@comment template": "Compares the local project files with icc-component",
+        "template":"%npm_package_config_ps% Start-Process -NoNewWindow -FilePath 'C:/Program Files/Devart/Code Compare/codecompare.exe' -ArgumentList '-T1 template -T2 client C:/projects/es/icc-component/ ./'",
+        "ide": "set NODE_OPTIONS= && fnm use && code . && devenv ../../InsiteCommerce.sln",
+        "@comment chains": "Run to generate a list of handlers and pipelines in base code and the local extensions project. Optional args include 'basePath' (defaults to C:\\projects\\insite-commerce\\Legacy), 'customPath' (defaults to searching the current execution path for an Extensions folder), 'keywords,' 'not' and 'outfile' (defaults to C:\\Users\\[yourUser]\\ScriptOut\\chainList.txt)",
+        "@comment chains simple example": "npm run chains -- -keywords OrderHistory -not Line",
+        "@comment chains full example": "npm run chains -- -clientName ExpertServices -basePath C:\\projects\\insite-commerce\\legacy -customPath C:\\projects\\[clientBaseDir]]\\src\\Extensions -keywords OrderHistory -not Line -outFile C:\\Users\\[yourUser]\\ScriptOut\\[clientName]\\chainList-all.txt",
+        "chains": "%npm_package_config_ps% ./tools/findAllChains.ps1 %npm_package_config_clientName%",
+        "@comment diff": "Ensures diff will be opened in the difftool as a directory comparison",
+        "@comment diff examples": "Passing 'Head' compares working file-tree and staged changes to the Head of the current branch; Passing 'sandbox..production' allows you to specify two branches for comparison;",
+        "@comment diff:remote": "Compares local branch with its remote equivalent",
+        "diff": "git difftool --dir-diff",
+        "diff:remote": "git fetch origin && git difftool --dir-diff FETCH_HEAD",
+        "@comment setup scripts": "A series of setup scripts for Expert Services",
+        "presetup": "node setApiUrl.js %npm_package_config_clientName%",
+        "setup": "%npm_package_config_ps% ./tools/setupEnvironment -clientName %npm_package_config_clientName% -envName %npm_package_config_envName% -serverInstance %npm_package_config_sqlServerInstance% -siteShortName %npm_package_config_siteShortName%",
+        "ext": "%npm_package_config_ps% ./dist/buildExtensions",
+        "db": "%npm_package_config_ps% ./tools/importDb -clientName %npm_package_config_clientName% -envName %npm_package_config_envName% -serverInstance %npm_package_config_sqlServerInstance%",
+        "db:down": "%npm_package_config_ps% ./tools/deleteDb -clientName %npm_package_config_clientName% -serverInstance %npm_package_config_sqlServerInstance%",
+        "msbuild": "call \"C:/Program Files/Microsoft Visual Studio/2022/Enterprise/Common7/Tools/VsDevCmd.bat\" && msbuild -ds ../../InsiteCommerce.sln",
+        "local": "node startDevelopment.js %npm_package_config_blueprint%"
+    },
+    "dependencies": {
+    } 
+}

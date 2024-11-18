@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- change to net7.0, or net48;net7.0 if you want to multi target -->
+    <TargetFrameworks>net48</TargetFrameworks>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin\</OutputPath>
+    <!-- by default net7.0 has this enabled which can cause problems with classic CMS model validation. -->
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.VisualBasic" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Insite.Commerce.Public" Version="5.1.2311.2861+sts" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net48' ">
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DatabaseScripts\1.0\" />
+  </ItemGroup>
+  <Target Name="EmbedViews" AfterTargets="BeforeBuild">
+    <ItemGroup>
+      <EmbeddedResource Include="**\*.cshtml" />
+    </ItemGroup>
+  </Target>
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net48' ">
+    <PreBuildEvent>powershell.exe -ExecutionPolicy ByPass -File "$(MSBuildProjectDirectory)\..\..\tools\validateReferences.ps1" -projectPath  "$(MSBuildProjectDirectory)\Extensions.csproj"</PreBuildEvent>
+  </PropertyGroup>
+</Project>

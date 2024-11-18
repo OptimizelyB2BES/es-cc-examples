@@ -1,0 +1,122 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Insite.Commerce.Public" Version="x.x.xxxx.xxxx+lts" />
+    <PackageReference Include="Insite.Commerce.Private" Version="x.x.xxxx.xxxx+lts" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Extensions\Extensions.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin\</OutputPath>
+    <TargetFrameworks>net48</TargetFrameworks>
+    <!-- pin to a version we know will work across customers -->
+    <LangVersion>9</LangVersion>
+    <TypeScriptToolsVersion>4.3</TypeScriptToolsVersion>
+    <AssemblyTitle>InsiteCommerce.Web</AssemblyTitle>
+    <BuildDependsOn>$(BuildDependsOn);AfterBuildMigrated</BuildDependsOn>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DeployDefaultTargetFrameworkVersion>net48</DeployDefaultTargetFrameworkVersion>
+    <EnableSharedGlobalUsings>false</EnableSharedGlobalUsings>
+    <!-- MSB3247 is about binding redirects, we handle those in code now -->
+    <NoWarn>$(NoWarn);MSB3247</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>TRACE;DEBUG;NOETAG</DefineConstants>
+    <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
+    <TypeScriptNoEmitOnError>false</TypeScriptNoEmitOnError>
+    <TypeScriptNoImplicitAny>False</TypeScriptNoImplicitAny>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+      IF NOT EXIST "$(MSBuildProjectDirectory)\config\connectionStrings.config" (
+      IF EXIST "$(MSBuildProjectDirectory)\config\connectionStrings.default.config" copy "$(MSBuildProjectDirectory)\config\connectionStrings.default.config" "$(MSBuildProjectDirectory)\config\connectionStrings.config"
+      )
+
+      IF NOT EXIST "$(MSBuildProjectDirectory)\config\appSettings.config" (
+      IF EXIST "$(MSBuildProjectDirectory)\config\appSettings.default.config" copy "$(MSBuildProjectDirectory)\config\appSettings.default.config" "$(MSBuildProjectDirectory)\config\appSettings.config"
+      )
+
+      IF NOT EXIST "$(MSBuildProjectDirectory)\App_Data\insiteidentity.pfx" (
+      IF EXIST "$(MSBuildProjectDirectory)\..\..\..\.config\identity.pfx" copy "$(MSBuildProjectDirectory)\..\..\..\.config\identity.pfx" "$(MSBuildProjectDirectory)\App_Data\insiteidentity.pfx"
+      )
+    </PreBuildEvent>
+  </PropertyGroup>
+  <Target Name="AfterBuildMigrated" Condition="'$(Configuration)' == 'Debug' And Exists('$(RepoRoot)\Src\Backend\warmCommerce.bat')">
+    <!-- the only way I could determine to fire and forgot powershell involved this command + a batch script -->
+    <Exec Command="powershell start-process $(RepoRoot)\Src\Backend\warmCommerce.bat -NoProfile -WindowStyle hidden" />
+  </Target>
+  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
+  </Target>
+  <ItemGroup>
+    <ProjectCapability Include="DotNetCoreWeb" />
+    <ProjectCapability Include="SupportsSystemWeb" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="mscorlib" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Runtime.Remoting" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.Abstractions">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Web.Routing">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Areas\**\*.cshtml" />
+    <Content Include="Images\**\*" />
+    <Content Include="QuickPing.aspx" />
+    <Content Include="ImportExport\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="AdminConsoleMenuExtensions.json" />
+    <Content Include="crossdomain.xml" />
+    <Content Include="config\*.config" />
+    <Content Include="Global.asax" />
+    <Content Include="Integration\Integration.svc" />
+    <Content Include="SimplePing.aspx" />
+    <Content Include="UserFiles\**\*" />
+    <Content Include="_viewstart.cshtml" />
+    <Content Include="Web.config" />
+    <Content Include="Excel\**\*" />
+    <TypeScriptCompile Include="_SystemResources\**\*.ts" />
+    <Content Include="Manager.ttinclude" />
+    <None Include="_SystemResources\**\*.css" />
+    <None Include="_SystemResources\**\*.scss" />
+    <None Include="_SystemResources\**\*.cshtml" />
+    <None Include="_SystemResources\**\*.liquid" />
+    <Content Include="App_Config\*.config" />
+    <Content Include="Themes\**\*" />
+    <Content Remove="Themes\**\bin\**\*" />
+    <Content Remove="Themes\**\obj\**\*" />
+    <Compile Remove="node_modules\**\*" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">17.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <!-- if this doesn't exist, it means the build is happening in the context of dotnet. disabling the import in that context allows commands like dotnet list to work properly -->
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="Exists('$(VSToolsPath)')" />
+</Project>

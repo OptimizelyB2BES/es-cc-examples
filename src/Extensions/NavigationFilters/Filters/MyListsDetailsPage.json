@@ -1,0 +1,9 @@
+{
+  "DisallowForPunchOut": {},
+  "ExcludeFromNavigation": {},
+  "IsAuthorized": {
+    "DisplayLinkForRememberedUser": true,
+    "IsAllowedForRememberedUser": true,
+    "DisallowedRoles": [ "Accounting" ]
+  }
+}

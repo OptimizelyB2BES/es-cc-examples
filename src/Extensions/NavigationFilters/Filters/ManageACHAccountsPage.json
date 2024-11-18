@@ -1,0 +1,7 @@
+{
+  "IsAuthorized": {
+    "DisplayLinkForRememberedUser": true,
+    "AllowedRoles": [ "Administrator", "Buyer3", "Accounting" ],
+    "DisallowedRoles": [ "Requisitioner", "Buyer1", "Buyer2" ]
+  }
+}

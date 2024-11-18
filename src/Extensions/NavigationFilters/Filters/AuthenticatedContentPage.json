@@ -1,0 +1,6 @@
+{
+  "IsAuthorized": {
+    "DisplayLinkForRememberedUser": true,
+    "IsAllowedForGuestUser": false
+  }
+}
